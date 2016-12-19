@@ -1,0 +1,66 @@
+<html>
+<head>
+  <title>A Leaflet map!</title>
+  <link rel="stylesheet" href="leaflet/leaflet.css"/>
+  <script src="leaflet/leaflet.js"></script>
+  <style>
+    #map{ width: 1200px; height: 600px; }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+  <input type="file" name="files[]" id="file" multiple="">
+  <script>
+
+  // initialize the map
+  var map = L.map('map').setView([39.8663,116.3535], 15);
+
+  // load a tile layer
+  L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: 'Tiles by OpenStreetMap',
+      maxZoom: 19,
+      minZoom: 9
+    }).addTo(map);
+
+  document.getElementById('file').onchange = function()
+  {
+
+     //var file = this.files[0];
+	 var colors=["red","blue","green","yellow"];
+	 var color_counter=0;
+	 for(var counter = 0; counter < this.files.length; counter++)
+	 {
+		var reader = new FileReader();
+		var tmp_counter = counter;
+		reader.onload = function(progressEvent)
+		{
+			var lines = this.result.split('\n');	
+			var latLngs=[];
+		
+			for(var line = 0; line < lines.length; line++)
+			{
+				var arr = lines[line].split(",");
+				console.log(arr);
+				var lat = new L.latLng(arr[1], arr[2]);
+				latLngs.push(lat)
+				console.log(lat);
+				var marker = L.marker(lat).addTo(map).bindPopup("info: " + arr[0]).openPopup();
+			}
+			//create a red polyline from an array of LatLng points
+			var polyline = L.polyline(latLngs, {color: colors[color_counter++%colors.length]}).addTo(map);
+			// zoom the map to the polyline
+			//map.fitBounds(polyline.getBounds());
+		
+		};
+		var file = this.files[counter];
+		reader.readAsText(file);
+	 }
+     //reader.readAsText(file);
+   };
+
+
+  </script>
+</body>
+</html>
